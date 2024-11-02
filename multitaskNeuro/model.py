@@ -144,7 +144,7 @@ class SFCNMTL(nn.Module):
 
 
 class SFCNAUX(nn.Module):
-    def __init__(self, channel_number=[32, 64, 128, 256, 256, 64], dropout=True):
+    def __init__(self, aux_size=5, channel_number=[32, 64, 128, 256, 256, 64]):
         super(SFCNAUX, self).__init__()
         n_layer = len(channel_number)
         self.feature_extractor = nn.Sequential()
@@ -176,12 +176,11 @@ class SFCNAUX(nn.Module):
         self.classifier = nn.Sequential()
         avg_shape = [5, 6, 5]
         self.classifier.add_module("average_pool", nn.AvgPool3d(avg_shape))
-        if dropout is True:
-            self.classifier.add_module("dropout", nn.Dropout(0.5))
+        self.classifier.add_module("dropout", nn.Dropout(0.5))
         i = n_layer
         in_channel = channel_number[-1]
-        self.final_0 = nn.Conv3d(in_channel, 40, padding=0, kernel_size=1)
-        self.final_1 = nn.Conv3d(in_channel, 5, padding=0, kernel_size=1)
+        self.final_0 = nn.Conv3d(in_channel, 25, padding=0, kernel_size=1)
+        self.final_1 = nn.Conv3d(in_channel, aux_size, padding=0, kernel_size=1)
 
     @staticmethod
     def conv_layer(in_channel, out_channel, maxpool=True, dropout=False, kernel_size=3, padding=0, maxpool_stride=2):
@@ -202,14 +201,16 @@ class SFCNAUX(nn.Module):
             layer.add_module("dropout", nn.Dropout(0.5))
         return layer
 
-    def forward(self, x, label):
+    def forward(self, x):
         x_f = self.feature_extractor(x)
         x = self.classifier(x_f)
 
-        if label == "age":
-            x = self.final_0(x)
-        elif label == "aux":
-            x = self.final_1(x)
+        x_age = F.log_softmax(self.final_0(x), dim=1)
+        x_aux = F.log_softmax(self.final_1(x), dim=1)
+        return x_age, x_aux
 
-        x = F.log_softmax(x, dim=1)
-        return x
+    def embed(self, x):
+        x_f = self.feature_extractor(x)
+        x = self.classifier(x_f)
+        last_embedding = self.final_0(x)
+        return x, last_embedding.squeeze(), F.log_softmax(last_embedding, dim=1)
