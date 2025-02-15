@@ -108,7 +108,7 @@ def test_dataloader():
         print(batch)
         print(batch[0].shape, batch[1].shape)
 
-    print("anndatagraphdatamodule checks passed")
+    print("checks passed")
 
     return
 
