@@ -1,4 +1,8 @@
+from datetime import datetime
+from pathlib import Path
+
 import numpy as np
+import toml
 import torch.nn as nn
 from scipy.stats import norm
 
@@ -86,3 +90,30 @@ def kldivloss(x, y):
     loss = loss_func(x, y) / n
     # print(loss)
     return loss
+
+
+def get_datetime(expname: str = ""):
+    datetime_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    if expname is None:
+        expname = datetime_str
+    else:
+        expname = f"{datetime_str}_{expname}"
+    return expname
+
+
+# datareaders.py functionality from nichecompass
+def get_paths(verbose: bool = False) -> dict:
+    """
+    Get custom paths from config.toml in the package root directory.
+    """
+
+    # get path of this file
+    root_path = Path(__file__).parent.parent
+    config_path = root_path / "config.toml"
+    if not config_path.exists():
+        raise FileNotFoundError(f"Config file not found at {config_path}")
+    config = toml.load(config_path)
+    config["package_root"] = root_path
+    if verbose:
+        print(config)
+    return config

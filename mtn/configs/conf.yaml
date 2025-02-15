@@ -1,0 +1,28 @@
+expname: "default"
+
+data:
+  batch_size: 128
+  quantile: 31
+  rand_seed: 42
+
+model:
+  num_classes: ${data.quantile}
+  transform: false
+
+logging:
+  log_dir: "logs"
+  checkpoint_dir: "checkpoints"
+  on_step: false
+  on_epoch: true
+  prog_bar: true
+  logger: true
+
+trainer:
+  limit_train_batches: 1000
+  limit_val_batches: 100
+  max_epochs: 200
+  lr: 0.001
+
+hydra:
+  run:
+    dir: "../../data/hydralogs/"

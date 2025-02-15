@@ -9,8 +9,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from multitaskNeuro.data import MriAuxStress
-from multitaskNeuro.model import SFCNAUX
+from mtn.data import MriAuxStress
+from mtn.model import SFCNAUX
 
 
 def parse_args():

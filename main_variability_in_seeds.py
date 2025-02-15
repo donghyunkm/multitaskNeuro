@@ -12,7 +12,7 @@ from scipy.spatial import distance
 from scipy.stats import ttest_ind
 from torch.utils.data import DataLoader
 
-from multitaskNeuro.data import MriAUX_stress
+from mtn.data import MriAUX_stress
 
 
 # https://github.com/jayroxis/CKA-similarity/blob/main/CKA.py

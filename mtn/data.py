@@ -9,7 +9,7 @@ import torchvision.transforms as transforms
 from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
 from torch.utils.data import Dataset
 
-from multitaskNeuro.utils import *
+from mtn.utils import *
 
 
 def get_df(cnt, fold_ix):

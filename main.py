@@ -12,9 +12,9 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
 
-from multitaskNeuro.data import MriAux
-from multitaskNeuro.model import SFCNAUX
-from multitaskNeuro.utils import *
+from mtn.data import MriAux
+from mtn.model import SFCNAUX
+from mtn.utils import *
 
 
 def parse_args():
