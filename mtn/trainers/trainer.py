@@ -5,7 +5,7 @@ from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 from omegaconf import DictConfig, OmegaConf
 
 from mtn.data.data import FmriDataModule
-from mtn.models.models import LitMLP
+from mtn.models.models import LitMLP, LitMLP_kl
 from mtn.utils import get_datetime, get_paths
 
 
@@ -21,11 +21,19 @@ def main(config: DictConfig):
 
     # helpers
     tb_logger = TensorBoardLogger(save_dir=log_path)
+    # checkpoint_callback = ModelCheckpoint(
+    #     dirpath=checkpoint_path,
+    #     monitor="val_auroc",
+    #     filename="{epoch}-{val_auroc:.2f}",
+    #     mode="max",
+    #     save_top_k=1,
+    #     every_n_epochs=1,
+    # )
     checkpoint_callback = ModelCheckpoint(
         dirpath=checkpoint_path,
-        monitor="val_auroc",
-        filename="{epoch}-{val_auroc:.2f}",
-        mode="max",
+        monitor="val_mae",
+        filename="{epoch}-{val_mae:.2f}",
+        mode="min",
         save_top_k=1,
         every_n_epochs=1,
     )
@@ -38,7 +46,7 @@ def main(config: DictConfig):
     )
 
     # model
-    model = LitMLP(config)
+    model = LitMLP_kl(config)
 
     # fit wrapper
     trainer = L.Trainer(

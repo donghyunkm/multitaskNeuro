@@ -33,26 +33,31 @@ class FmriDataModule(L.LightningDataModule):
         data_dir = get_paths()["data_root"]
         features = np.load(data_dir + "triangle.npy")
         labels = np.load(data_dir + "age_labels_norm.npy")
+        y = np.load(data_dir + "y_age.npy")
+        bc = np.load(data_dir + "y_bc.npy")
+        y_aux = np.load(data_dir + "labels_aux.npy")
 
         x = torch.from_numpy(features)
         x = x.to(torch.float32)
         self.x = x
-        if self.quantile < 31:
-            y = torch.tensor(pd.qcut(labels, q=self.quantile, labels=False))
-        else:
-            y = torch.tensor(labels)
-        self.y = y
+
+        self.y_aux = torch.from_numpy(y_aux)
+        self.labels = torch.tensor(labels)
+        self.y = torch.from_numpy(y)
+        self.bc = torch.from_numpy(bc)
 
     def get_indices(self):
         # Get indices for train/val/test splits, stratified by y
-        indices = np.arange(len(self.y))
+        indices = np.arange(len(self.labels))
 
         # First split into train+val vs test (80/20)
-        train_val_idx, test_idx = train_test_split(indices, test_size=0.2, stratify=self.y, random_state=self.rand_seed)
+        train_val_idx, test_idx = train_test_split(
+            indices, test_size=0.2, stratify=self.labels, random_state=self.rand_seed
+        )
 
         # Split train+val into train vs val (80/20 of remaining data)
         train_idx, val_idx = train_test_split(
-            train_val_idx, test_size=0.2, stratify=self.y[train_val_idx], random_state=self.rand_seed
+            train_val_idx, test_size=0.2, stratify=self.labels[train_val_idx], random_state=self.rand_seed
         )
 
         return train_idx, val_idx, test_idx
@@ -63,7 +68,13 @@ class FmriDataModule(L.LightningDataModule):
 
     def train_dataloader(self):
         return DataLoader(
-            dataset=TensorDataset(self.x[self.train_idx], self.y[self.train_idx]),
+            dataset=TensorDataset(
+                self.x[self.train_idx],
+                self.y[self.train_idx],
+                self.bc[self.train_idx],
+                self.labels[self.train_idx],
+                self.y_aux[self.train_idx],
+            ),
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=4,
@@ -71,7 +82,13 @@ class FmriDataModule(L.LightningDataModule):
 
     def val_dataloader(self):
         return DataLoader(
-            dataset=TensorDataset(self.x[self.val_idx], self.y[self.val_idx]),
+            dataset=TensorDataset(
+                self.x[self.val_idx],
+                self.y[self.val_idx],
+                self.bc[self.val_idx],
+                self.labels[self.val_idx],
+                self.y_aux[self.val_idx],
+            ),
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=4,
@@ -79,7 +96,13 @@ class FmriDataModule(L.LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(
-            dataset=TensorDataset(self.x[self.test_idx], self.y[self.test_idx]),
+            dataset=TensorDataset(
+                self.x[self.test_idx],
+                self.y[self.test_idx],
+                self.bc[self.test_idx],
+                self.labels[self.test_idx],
+                self.y_aux[self.test_idx],
+            ),
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=4,
@@ -87,7 +110,13 @@ class FmriDataModule(L.LightningDataModule):
 
     def predict_dataloader(self):
         return DataLoader(
-            dataset=TensorDataset(self.x[self.test_idx], self.y[self.test_idx]),
+            dataset=TensorDataset(
+                self.x[self.test_idx],
+                self.y[self.test_idx],
+                self.bc[self.test_idx],
+                self.labels[self.test_idx],
+                self.y_aux[self.test_idx],
+            ),
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=4,
@@ -104,9 +133,7 @@ def test_dataloader():
 
     for i in range(3):
         batch = next(dataloader)
-
-        print(batch)
-        print(batch[0].shape, batch[1].shape)
+        print(batch[0].shape, batch[1].shape, batch[2].shape, batch[3], batch[4])
 
     print("checks passed")
 
