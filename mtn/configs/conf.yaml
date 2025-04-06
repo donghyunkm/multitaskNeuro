@@ -3,11 +3,17 @@ expname: "default"
 data:
   batch_size: 128
   quantile: 31
-  rand_seed: 42
+  rand_seed: 0
+  trainval_size: -1
+  fold_ix: 0
 
 model:
   num_classes: ${data.quantile}
-  transform: false
+  transform: true
+  mode: 0
+
+optimizer:
+  name: "sgd"
 
 logging:
   log_dir: "logs"
@@ -20,7 +26,7 @@ logging:
 trainer:
   limit_train_batches: 1000
   limit_val_batches: 100
-  max_epochs: 200
+  max_epochs: 1000
   lr: 0.001
 
 hydra:
