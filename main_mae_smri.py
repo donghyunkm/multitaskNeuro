@@ -1,4 +1,4 @@
-# Calculate all pairwise similarities (linear CKA) between representations of the same subject from the same model but trained with different random initializations.
+# Evaluate with MAE for sMRI models
 import argparse
 import glob
 import itertools

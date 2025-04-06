@@ -1,4 +1,4 @@
-# Save model activations
+# Save model activations (sMRI)
 import argparse
 import itertools
 import random

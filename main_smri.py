@@ -1,4 +1,4 @@
-# Train, save, and evaluate models
+# Train, save, and evaluate sMRI models
 import argparse
 import random
 import time

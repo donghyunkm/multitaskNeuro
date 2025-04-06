@@ -1,4 +1,4 @@
-# Save model activations (fmri)
+# Save model activations (fMRI)
 import argparse
 import glob
 import itertools
